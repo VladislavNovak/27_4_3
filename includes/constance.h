@@ -4,8 +4,8 @@
 #include <iostream>
 #include <vector>
 
-enum class Menu { TASK, PRINT, EXIT };
-std::vector<std::string> menuTitles = { "task", "print", "exit" };
+enum class Menu { EXIT, PRINT, TASK };
+std::vector<std::string> menuTitles = { "exit", "print", "task" };
 
 enum class TaskType { A, B, C, NONE };
 std::vector<char> tasksTitles = { 'A', 'B', 'C' };

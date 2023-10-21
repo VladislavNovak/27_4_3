@@ -13,24 +13,32 @@ using std::endl;
 using std::string;
 using std::vector;
 
-struct Base {
+class Base {
+protected:
     string name{};
+public:
     explicit Base(const string &inName) { name = inName; }
 };
 
-struct Supervisor;
-struct Manager;
+class Supervisor;
+class Manager;
 
-struct Worker: public Base {
-    TaskType taskType = TaskType::NONE;
+class Worker: public Base {
     Manager* parent = nullptr;
+    TaskType taskType = TaskType::NONE;
+public:
     explicit Worker(const string &inName): Base(inName) {}
+    TaskType getTaskType() { return taskType; }
+    void setTaskType(TaskType inType) { taskType = inType; }
+    std::string getName() { return name; }
+    void setParent(Manager* manager) { parent = manager; }
 };
 
-struct Manager: public Base {
+class Manager: public Base {
     int number{};
     Supervisor* parent = nullptr;
     vector<Worker*> children;
+public:
     explicit Manager(const string &inName, int inNumber): Base(inName) {
         number = inNumber;
     }
@@ -43,12 +51,13 @@ struct Manager: public Base {
             children.clear();
         }
     }
+    void setParent(Supervisor* supervisor) { parent = supervisor; }
     // Передает команду элементу. Возвращает оставшееся количество свободных работников
     int setTask(int task) {
         // Количество ещё доступных рабочих
         int availableWorkersCount = 0;
-        for (const auto &item : children) {
-            if (item->taskType == TaskType::NONE) { ++availableWorkersCount; }
+        for (const auto &worker : children) {
+            if (worker->getTaskType() == TaskType::NONE) { ++availableWorkersCount; }
         }
         // Если рабочих нет, выходим
         if (!availableWorkersCount) { return 0; }
@@ -60,11 +69,11 @@ struct Manager: public Base {
         cout << "Manager " << this->name << "(group #" << this->number << ")"  << " transfer task to:" << endl;
 
         for (auto &worker : children) {
-            if (worker->taskType == TaskType::NONE) {
+            if (worker->getTaskType() == TaskType::NONE) {
                 // Генерируем и даём задачу
                 int realTask = getRandomIntInRange(0, (int)TaskType::C);
-                worker->taskType = static_cast<TaskType>(realTask);
-                cout << " - Worker " << worker->name << " got task #" << tasksTitles[realTask] << endl;
+                worker->setTaskType(static_cast<TaskType>(realTask));
+                cout << " - Worker " << worker->getName() << " got task #" << tasksTitles[realTask] << endl;
                 --taskCount;
                 --availableWorkersCount;
                 if (!taskCount) { break; }
@@ -74,23 +83,24 @@ struct Manager: public Base {
         return availableWorkersCount;
     }
     void addChild(Worker* b) {
-        b->parent = this;
+        b->setParent(this);
         children.emplace_back(b);
     }
     void printChildren(int indent = 0) {
         if (!children.empty()) {
             cout << std::setw(indent) << this->name << "(Manager):" << endl;
             for (auto &worker: children) {
-                cout << std::setw(indent * 2) << worker->name << "(Worker)";
-                if (worker->taskType == TaskType::NONE) { cout << " without task" << endl; }
-                else { cout << "with task " << tasksTitles[static_cast<int>(worker->taskType)] << endl; }
+                cout << std::setw(indent * 2) << worker->getName() << "(Worker)";
+                if (worker->getTaskType() == TaskType::NONE) { cout << " without task" << endl; }
+                else { cout << "with task " << tasksTitles[static_cast<int>(worker->getTaskType())] << endl; }
             }
         }
     }
 };
 
-struct Supervisor: public Base {
+class Supervisor: public Base {
     vector<Manager*> children;
+public:
     explicit Supervisor(const string &inName): Base(inName) {}
     ~Supervisor() {
         if (!children.empty()) {
@@ -102,7 +112,7 @@ struct Supervisor: public Base {
         }
     }
     void addChild(Manager* b) {
-        b->parent = this;
+        b->setParent(this);
         children.emplace_back(b);
     }
     // Получает начальную задачу. Возвращает true, если есть хоть один незанятый worker
