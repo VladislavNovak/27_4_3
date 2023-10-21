@@ -45,7 +45,6 @@ struct Manager: public Base {
     }
     // Передает команду элементу. Возвращает оставшееся количество свободных работников
     int setTask(int task) {
-        cout << "Manager " << this->name << "(group #" << this->number << ")"  << " got a task (" << task << ")" << endl;
         // Количество ещё доступных рабочих
         int availableWorkersCount = 0;
         for (const auto &item : children) {
@@ -53,35 +52,38 @@ struct Manager: public Base {
         }
         // Если рабочих нет, выходим
         if (!availableWorkersCount) { return 0; }
+
         // В противном случае - даём случайному количеству незанятых работников новые задачи:
         std::srand(task + this->number);
         int taskCount = getRandomIntInRange(1, availableWorkersCount);
+
+        cout << "Manager " << this->name << "(group #" << this->number << ")"  << " transfer task to:" << endl;
 
         for (auto &worker : children) {
             if (worker->taskType == TaskType::NONE) {
                 // Генерируем и даём задачу
                 int realTask = getRandomIntInRange(0, (int)TaskType::C);
                 worker->taskType = static_cast<TaskType>(realTask);
-                cout << "Worker " << worker->name << " got task #" << tasksTitles[realTask] << endl;
+                cout << " - Worker " << worker->name << " got task #" << tasksTitles[realTask] << endl;
+                --taskCount;
+                --availableWorkersCount;
+                if (!taskCount) { break; }
             }
         }
         // Если будет 0, значит свободных рабочих больше нет
-        return (availableWorkersCount - taskCount);
+        return availableWorkersCount;
     }
     void addChild(Worker* b) {
         b->parent = this;
         children.emplace_back(b);
     }
-    void createChild(const std::string &inName) {
-        auto* item = new Worker(inName);
-        item->parent = this;
-        children.emplace_back(item);
-    }
     void printChildren(int indent = 0) {
         if (!children.empty()) {
             cout << std::setw(indent) << this->name << "(Manager):" << endl;
-            for (auto &item: children) {
-                cout << std::setw(indent * 2) << item->name << "(Worker)" << endl;
+            for (auto &worker: children) {
+                cout << std::setw(indent * 2) << worker->name << "(Worker)";
+                if (worker->taskType == TaskType::NONE) { cout << " without task" << endl; }
+                else { cout << "with task " << tasksTitles[static_cast<int>(worker->taskType)] << endl; }
             }
         }
     }

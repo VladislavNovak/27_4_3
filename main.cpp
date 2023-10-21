@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include "includes/constance.h"
 #include "includes/utilities.h"
 #include "includes/Classes.h"
 
@@ -10,12 +11,13 @@ using std::vector;
 
 int main() {
     // initial
+    cout << "---Initial---" << endl;
     auto* supervisor = new Supervisor(putLineString("Enter name of supervisor"));
     int teamsCount = putNumeric({1, 10},{}, "count of teams");
 
     for (int j = 0; j < teamsCount; ++j) {
 
-        cout << "----- Teams #" << j << " -----" << endl;
+        cout << "---Teams #" << j << "---" << endl;
         auto* manager = new Manager(putLineString("Enter name of manager"), j);
 
         int workerCount = putNumeric({1, 10},{}, "count of workers");
@@ -29,10 +31,29 @@ int main() {
 
     // end initial
 
-    supervisor->setTask(4);
+    while (true) {
+        std::cout << "--- Main menu ---" << std::endl;
+        int command = selectMenuItem(menuTitles);
 
-    supervisor->printChildren();
-    delete supervisor;
+        if (command == static_cast<int>(Menu::TASK)) {
+            std::cout << "Menu --> task mode -->" << std::endl;
+            // Задаем новую команду
+            int task = putNumeric({},{}, "new task");
+            supervisor->setTask(task);
+        }
+        else if (command == static_cast<int>(Menu::PRINT)) {
+            std::cout << "Menu --> print mode -->" << std::endl;
+            supervisor->printChildren();
+        }
+        else if (command == static_cast<int>(Menu::EXIT)) {
+            std::cout << "Menu --> exit mode -->" << std::endl;
+            delete supervisor;
+            supervisor = nullptr;
+            break;
+        }
+    }
+
+    cout << "THE END!" << endl;
 
     return 0;
 }
