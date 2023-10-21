@@ -9,6 +9,7 @@ using std::string;
 using std::vector;
 
 int main() {
+    // initial
     auto* supervisor = new Supervisor(putLineString("Enter name of supervisor"));
     int teamsCount = putNumeric({1, 10},{}, "count of teams");
 
@@ -25,6 +26,10 @@ int main() {
 
         supervisor->addChild(manager);
     }
+
+    // end initial
+
+    supervisor->setTask(4);
 
     supervisor->printChildren();
     delete supervisor;

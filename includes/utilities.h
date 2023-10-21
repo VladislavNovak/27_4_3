@@ -84,4 +84,8 @@ std::string putLineString(const std::string &msg) {
     }
 }
 
+int getRandomIntInRange(int from, int to) {
+    return (from + std::rand() % (to - from + 1)); // NOLINT(cert-msc50-cpp)
+}
+
 #endif //INC_27_4_3_UTILITIES_H
