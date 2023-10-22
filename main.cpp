@@ -1,15 +1,20 @@
 #include <iostream>
 #include <vector>
-#include "includes/constance.h"
-#include "includes/utilities.h"
-#include "includes/Classes.h"
+#include "constance.h"
+#include "utilities.h"
+#include "Worker.h"
+#include "Manager.h"
+#include "Supervisor.h"
 
 using std::cout;
 using std::endl;
 using std::string;
 using std::vector;
 
+
 int main() {
+    std::vector<std::string> menuTitles = { "exit", "print", "task" };
+
     // initial
     cout << "---Initial---" << endl;
     auto* supervisor = new Supervisor(putLineString("Enter name of supervisor"));
